@@ -10,7 +10,6 @@
 </head>
 
 <body>
-    <!-- Navigation bar -->
     <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -39,33 +38,50 @@
         </div>
     </nav>
 
-    <!-- Page content -->
     <div class="container-fluid">
         <h2>{{ course.name }}</h2>
         <div class="card-columns-vertical">
+            {% comment %}
+            Bucle que itera a través de todas las lecciones asociadas a este curso.
+            'course.lesson_set.all' es la forma en que Django accede a los objetos relacionados "hacia atrás" desde una clave foránea.
+            {% endcomment %}
             {% for lesson in course.lesson_set.all %}
                 <div class="card mt-1">
-                    <div class="card-header"><h5>Lesson {{lesson.order|add:1}}: {{lesson.title}}</h5></div>
+                    <div class="card-header">
+                        {% comment %}
+                        El filtro '|add:1' se usa para mostrar el número de lección empezando en 1 en lugar de 0, que es como se almacena.
+                        {% endcomment %}
+                        <h5>Lesson {{lesson.order|add:1}}: {{lesson.title}}</h5>
+                    </div>
                     <div class="card-body">{{lesson.content}}</div>
                 </div>
             {% endfor %}
         </div>
-        <!-- Course detail template changes go here -->
+        
+        {% comment %} Solo los usuarios autenticados pueden ver y realizar el examen. {% endcomment %}
         {% if user.is_authenticated %}
             </br>
+            {% comment %} Este botón utiliza atributos de Bootstrap ('data-toggle', 'data-target') para mostrar u ocultar el div del examen. {% endcomment %}
             <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#exam">Start Exam</button>
             <div id="exam" class="collapse">
+                {% comment %} El formulario envía los datos a la vista 'submit', pasando el ID del curso actual. {% endcomment %}
                 <form id="questionform" action="{% url 'onlinecourse:submit' course.id %}" method="POST">
+                    {% comment %} Bucle para mostrar cada pregunta asociada al curso. {% endcomment %}
                     {% for question in course.question_set.all %}
                         <div class="card mt-1">
                             <div class="card-header">
-                                <h5>{{ question.content }}</h5>
+                                <h5>{{ question.question }}</h5>
                             </div>
                             {% csrf_token %}
                             <div class="form-group">
+                                {% comment %} Bucle anidado para mostrar cada opción de la pregunta actual. {% endcomment %}
                                 {% for choice in question.choice_set.all %}
                                     <div class="form-check">
                                         <label class="form-check-label">
+                                            {% comment %}
+                                            Cada checkbox se nombra de forma única pero predecible ('choice_ID')
+                                            y su valor es el ID de la opción. Esto permite a la vista 'submit' identificar qué opciones fueron seleccionadas.
+                                            {% endcomment %}
                                             <input type="checkbox" name="choice_{{choice.id}}" class="form-check-input"
                                                 id="{{choice.id}}" value="{{choice.id}}">{{ choice.choice }}
                                         </label>

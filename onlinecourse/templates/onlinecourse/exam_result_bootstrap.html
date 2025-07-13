@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-
     <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -36,6 +35,11 @@
     </nav>
 
     <div class="container-fluid">
+        {% comment %}
+        Bloque condicional principal que determina el mensaje de resultado.
+        La variable 'grade' es calculada en la vista 'show_exam_result' y pasada en el contexto.
+        Si la calificación es mayor a 80, se muestra un mensaje de éxito.
+        {% endcomment %}
         {% if grade > 80 %}
             <div class="alert alert-success">
                 <b>Congratulations, {{ user.first_name }}!</b> You have passed the exam and completed the course with score {{ grade }}/100
@@ -44,33 +48,46 @@
             <div class="alert alert-danger">
                 <b>Failed</b> Sorry, {{ user.first_name }}! You have failed the exam with score {{ grade }}/100
             </div>
+            {% comment %} Si el usuario falla, se le ofrece un enlace para reintentar el examen, que lo lleva de vuelta a los detalles del curso. {% endcomment %}
             <a class="btn btn-link text-danger" href="{% url 'onlinecourse:course_details' course.id %}">Re-test</a>
         {% endif %}
         <div class="card-columns-vertical mt-1">
             <h5 class="">Exam results</h5>
+            {% comment %} Bucle sobre todas las preguntas del curso para mostrar un desglose de las respuestas. {% endcomment %}
             {% for question in course.question_set.all %}
                 <div class="card mt-1">
                     <div class="card-header">
                         <h5>{{ question.question }}</h5>
                     </div>
                     <div class="form-group">
+                        {% comment %} Bucle anidado sobre cada opción de la pregunta actual. {% endcomment %}
                         {% for choice in question.choice_set.all %}
                             <div class="form-check">
+                                {% comment %}
+                                INICIO DE LÓGICA DE VISUALIZACIÓN DE RESPUESTAS
+                                'choices' es la lista de las opciones que el usuario seleccionó, pasada desde la vista.
+                                'choice.is_correct' es un booleano del modelo Choice.
+                                {% endcomment %}
+
+                                {% comment %} CASO 1: La opción es correcta Y el usuario la seleccionó. Se muestra en verde. {% endcomment %}
                                 {% if choice.is_correct and choice in choices %}
                                     <div class="text-success">
                                         Correct answer: {{ choice.choice }}
                                     </div>
                                 {% else %}
+                                    {% comment %} CASO 2: La opción es correcta PERO el usuario NO la seleccionó. Se muestra en amarillo. {% endcomment %}
                                     {% if choice.is_correct and not choice in choices %}
                                         <div class="text-warning">
                                             Not selected: {{ choice.choice }}
                                         </div>
                                     {% else %}
+                                        {% comment %} CASO 3: La opción NO es correcta PERO el usuario la seleccionó. Se muestra en rojo. {% endcomment %}
                                         {% if not choice.is_correct and choice in choices %}
                                             <div class="text-danger">
                                                 Wrong answer: {{ choice.choice }}
                                             </div>
                                         {% else %}
+                                            {% comment %} CASO 4: La opción NO es correcta Y el usuario NO la seleccionó. Se muestra normal. {% endcomment %}
                                             <div>
                                                 {{ choice.choice }}
                                             </div>

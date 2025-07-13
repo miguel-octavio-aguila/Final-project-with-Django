@@ -7,7 +7,6 @@
 </head>
 <body>
 
-<!-- Navigation bar -->
     <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -15,45 +14,50 @@
             </div>
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
-                <li>
-                    <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
-                    <a class="btn btn-link" href="{% url 'onlinecourse:logout' %}">Logout</a>
-                </li>
+                    <li>
+                        <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
+                        <a class="btn btn-link" href="{% url 'onlinecourse:logout' %}">Logout</a>
+                    </li>
                 {% else %}
-                <li>
-                    <form class="form-inline" action="{% url 'onlinecourse:login' %}" method="post">
-                        {% csrf_token %}
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Username" name="username" >
-                            <input type="password" class="form-control" placeholder="Password" name="psw" >
-                            <button class="btn btn-primary" type="submit">Login</button>
-                            <a class="btn btn-link" href="{% url 'onlinecourse:registration' %}">Sign Up</a>
-                        </div>
-                    </form>
-                </li>
+                    <li>
+                        <form class="form-inline" action="{% url 'onlinecourse:login' %}" method="post">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Username" name="username" >
+                                <input type="password" class="form-control" placeholder="Password" name="psw" >
+                                <button class="btn btn-primary" type="submit">Login</button>
+                                <a class="btn btn-link" href="{% url 'onlinecourse:registration' %}">Sign Up</a>
+                            </div>
+                        </form>
+                    </li>
                 {% endif %}
             </ul>
         </div>
     </nav>
 
-    <!-- Stylize Login form -->
     <form action="{% url 'onlinecourse:login' %}" method="post">
         {% csrf_token %}
-        <div class="container"> <!--Style root div with .container class -->
+        <div class="container"> 
             <h1>Login</h1>
-            <div class="form-group"> <!--Style second div with .form-group class -->
-              <label for="username"><b>User Name</b></label>
-              <input id="username" class = "form-control" type="text" placeholder="Enter User Name: " name="username" required> <!--Style input with .form-control class -->
-              <label for="psw"><b>Password</b></label>
-              <input id="psw" class = "form-control" type="password"  placeholder="Enter Password: " name="psw" required> <!--Style input with .form-control class -->
+            <div class="form-group">
+                <label for="username"><b>User Name</b></label>
+                <input id="username" class = "form-control" type="text" placeholder="Enter User Name: " name="username" required>
+                <label for="psw"><b>Password</b></label>
+                <input id="psw" class = "form-control" type="password"  placeholder="Enter Password: " name="psw" required>
             </div>
+            {% comment %}
+            Este bloque muestra un mensaje de error si la vista 'login_request' lo proporciona.
+            Por ejemplo, si el usuario o la contraseña son incorrectos.
+            La variable 'message' se pasa en el contexto desde la vista.
+            {% endcomment %}
             {% if message %}
-              <div class="alert alert-warning"> <!--Style the message paragraph with .alert and .alert-warning class -->
-                {{ message }}
-              </div>
+                <div class="alert alert-warning">
+                    {{ message }}
+                </div>
             {% endif %}
-            <button class="btn btn-primary" type="submit">Login</button> <!--Style button with .btn and .btn-primary class -->
+            <button class="btn btn-primary" type="submit">Login</button>
         </div>
     </form>
 
 </body>
+</html>
